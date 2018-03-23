@@ -41,6 +41,7 @@ public class UsersControllerTest {
     private MockMvc mockMvc;
 
     private User newUser;
+    private User updatedSecondUser;
 
     @Autowired
     private ObjectMapper jsonObjectMapper;
@@ -69,6 +70,13 @@ public class UsersControllerTest {
         );
 
         given(mockUserRepository.save(newUser)).willReturn(newUser);
+
+        updatedSecondUser = new User(
+                "updated_username",
+                "Updated",
+                "Info"
+        );
+        given(mockUserRepository.save(updatedSecondUser)).willReturn(updatedSecondUser);
 
         Iterable<User> mockUsers =
                 Stream.of(firstUser, secondUser).collect(Collectors.toList());
@@ -230,5 +238,53 @@ public class UsersControllerTest {
                                 .content(jsonObjectMapper.writeValueAsString(newUser))
                 )
                 .andExpect(jsonPath("$.lastName", is("User")));
+    }
+
+    @Test
+    public void updateUserById_success_returnsStatusOk() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        patch("/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateUserById_success_returnsUpdatedUserName() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        patch("/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
+                )
+                .andExpect(jsonPath("$.userName", is("new_username")));
+    }
+
+    @Test
+    public void updateUserById_success_returnsUpdatedFirstName() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        patch("/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
+                )
+                .andExpect(jsonPath("$.firstName", is("new")));
+    }
+
+    @Test
+    public void updateUserById_success_returnsUpdatedLastName() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        patch("/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
+                )
+                .andExpect(jsonPath("$.lastName", is("name")));
     }
 }
