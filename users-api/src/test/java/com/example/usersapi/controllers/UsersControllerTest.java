@@ -58,6 +58,8 @@ public class UsersControllerTest {
                 Stream.of(firstUser, secondUser).collect(Collectors.toList());
 
         given(mockUserRepository.findAll()).willReturn(mockUsers);
+        given(mockUserRepository.findOne(4L)).willReturn(null);
+        given(mockUserRepository.findOne(1L)).willReturn(firstUser);
     }
 
     @Test
@@ -98,4 +100,51 @@ public class UsersControllerTest {
                 .andExpect(jsonPath("$[0].lastName", is("Person")));
     }
 
+    @Test
+    public void findUserById_success_returnsStatusOK() throws Exception {
+
+        this.mockMvc
+                .perform(get("/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void findUserById_success_returnUserName() throws Exception {
+
+        this.mockMvc
+                .perform(get("/1"))
+                .andExpect(jsonPath("$.userName", is("someone")));
+    }
+
+    @Test
+    public void findUserById_success_returnFirstName() throws Exception {
+
+        this.mockMvc
+                .perform(get("/1"))
+                .andExpect(jsonPath("$.firstName", is("Ima")));
+    }
+
+    @Test
+    public void findUserById_success_returnLastName() throws Exception {
+
+        this.mockMvc
+                .perform(get("/1"))
+                .andExpect(jsonPath("$.lastName", is("Person")));
+    }
+
+    @Test
+    public void findUserById_failure_userNotFoundReturnsNotFoundErrorMessage() throws Exception {
+
+        this.mockMvc
+                .perform(get("/4"))
+                .andExpect(status().reason(containsString("User with ID of 4 was not found!")));
+    }
+
+    @Test
+    public void deleteUserById_success_returnsStatusOk() throws Exception {
+
+        this.mockMvc
+                .perform(delete("/1"))
+                .andExpect(status().isOk());
+    }
 }
