@@ -261,7 +261,7 @@ public class UsersControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
                 )
-                .andExpect(jsonPath("$.userName", is("new_username")));
+                .andExpect(jsonPath("$.userName", is("updated_username")));
     }
 
     @Test
@@ -273,7 +273,7 @@ public class UsersControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
                 )
-                .andExpect(jsonPath("$.firstName", is("new")));
+                .andExpect(jsonPath("$.firstName", is("Updated")));
     }
 
     @Test
@@ -285,6 +285,6 @@ public class UsersControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
                 )
-                .andExpect(jsonPath("$.lastName", is("name")));
+                .andExpect(jsonPath("$.lastName", is("Info")));
     }
 }
