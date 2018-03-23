@@ -147,4 +147,12 @@ public class UsersControllerTest {
                 .perform(delete("/1"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void deleteUserById_success_deletesViaRepository() throws Exception {
+
+        this.mockMvc.perform(delete("/1"));
+
+        verify(mockUserRepository, times(1)).delete(1L);
+    }
 }
