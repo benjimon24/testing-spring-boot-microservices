@@ -1,5 +1,6 @@
 package com.example.usersapi.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -38,6 +40,11 @@ public class UsersControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private User newUser;
+
+    @Autowired
+    private ObjectMapper jsonObjectMapper;
+
     @MockBean
     private UserRepository mockUserRepository;
 
@@ -54,6 +61,14 @@ public class UsersControllerTest {
                 "Someone",
                 "Else"
         );
+
+        newUser = new User(
+                "new_user_for_create",
+                "New",
+                "User"
+        );
+
+        given(mockUserRepository.save(newUser)).willReturn(newUser);
 
         Iterable<User> mockUsers =
                 Stream.of(firstUser, secondUser).collect(Collectors.toList());
@@ -167,5 +182,53 @@ public class UsersControllerTest {
         this.mockMvc
                 .perform(delete("/4"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createUser_success_returnsStatusOk() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        post("/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(newUser))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void createUser_success_returnsUserName() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        post("/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(newUser))
+                )
+                .andExpect(jsonPath("$.userName", is("new_user_for_create")));
+    }
+
+    @Test
+    public void createUser_success_returnsFirstName() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        post("/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(newUser))
+                )
+                .andExpect(jsonPath("$.firstName", is("New")));
+    }
+
+    @Test
+    public void createUser_success_returnsLastName() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        post("/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(newUser))
+                )
+                .andExpect(jsonPath("$.lastName", is("User")));
     }
 }
