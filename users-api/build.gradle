@@ -4,9 +4,12 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+		jcenter()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath "com.avast.gradle:gradle-docker-compose-plugin:0.6.17"
+
 	}
 }
 
@@ -14,6 +17,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'docker-compose'
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -43,3 +47,18 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
+
+test {
+	dependsOn cleanTest
+
+	testLogging {
+		exceptionFormat "full"
+		events "skipped", "passed", "failed"
+		displayGranularity 2
+	}
+}
+
+dockerCompose {
+	useComposeFiles = ['docker-compose.test.yml']
+}
+dockerCompose.isRequiredBy(test)
