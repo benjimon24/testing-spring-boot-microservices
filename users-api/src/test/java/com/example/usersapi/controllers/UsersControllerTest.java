@@ -287,4 +287,28 @@ public class UsersControllerTest {
                 )
                 .andExpect(jsonPath("$.lastName", is("Info")));
     }
+
+    @Test
+    public void updateUserById_failure_userNotFoundReturns404() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        patch("/4")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateUserById_failure_userNotFoundReturnsNotFoundErrorMessage() throws Exception {
+
+        this.mockMvc
+                .perform(
+                        patch("/4")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonObjectMapper.writeValueAsString(updatedSecondUser))
+                )
+                .andExpect(status().reason(containsString("User with ID of 4 was not found!")));
+    }
 }
