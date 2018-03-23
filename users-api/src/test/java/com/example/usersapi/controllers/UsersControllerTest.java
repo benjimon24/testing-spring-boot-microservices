@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -60,6 +61,10 @@ public class UsersControllerTest {
         given(mockUserRepository.findAll()).willReturn(mockUsers);
         given(mockUserRepository.findOne(4L)).willReturn(null);
         given(mockUserRepository.findOne(1L)).willReturn(firstUser);
+
+        doAnswer(invocation -> {
+            throw new EmptyResultDataAccessException("ERROR MESSAGE FROM MOCK!!!", 1234);
+        }).when(mockUserRepository).delete(4L);
     }
 
     @Test
@@ -154,5 +159,13 @@ public class UsersControllerTest {
         this.mockMvc.perform(delete("/1"));
 
         verify(mockUserRepository, times(1)).delete(1L);
+    }
+
+    @Test
+    public void deleteUserById_failure_userNotFoundReturns404() throws Exception {
+
+        this.mockMvc
+                .perform(delete("/4"))
+                .andExpect(status().isNotFound());
     }
 }
